@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hemio — Sign in</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%23e8821e'/><path d='M12 5.5 5.5 11v7.5h4v-5h5v5h4V11L12 5.5Z' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="login-body">
+
+<div id="wallpaper"></div>
+
+<div class="login-card glass">
+  <div class="login-logo"><svg width="54" height="54" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#e8821e"/><path d="M12 5.5 5.5 11v7.5h4v-5h5v5h4V11L12 5.5Z" fill="#fff"/></svg></div>
+  <h1>Hemio Dashboard</h1>
+  <p class="login-sub">Sign in to continue</p>
+  <form id="login-form" autocomplete="on">
+    <input id="li-user" type="text" placeholder="Username" autocomplete="username" required>
+    <input id="li-pass" type="password" placeholder="Password" autocomplete="current-password" required>
+    <div id="li-err" class="login-err" hidden>Invalid credentials</div>
+    <button type="submit" id="li-go">Sign In</button>
+  </form>
+  <p class="login-hint" id="li-hint"></p>
+</div>
+
+<script>
+(async () => {
+  const hint = document.getElementById('li-hint');
+  try {
+    const st = await (await fetch('/api/auth/status')).json();
+    if (!st.enabled) { location.replace('/'); return; }
+    if (st.default_password) hint.textContent = 'Default password is admin123 — change it in Settings → Users & Access';
+  } catch { hint.textContent = ''; }
+
+  const form = document.getElementById('login-form');
+  const err = document.getElementById('li-err');
+  const go = document.getElementById('li-go');
+  form.onsubmit = async e => {
+    e.preventDefault();
+    err.hidden = true; go.disabled = true; go.textContent = 'Signing in…';
+    try {
+      const r = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: document.getElementById('li-user').value, password: document.getElementById('li-pass').value })
+      });
+      if (r.status === 401) { err.hidden = false; err.textContent = 'Invalid credentials'; return; }
+      if (!r.ok) throw new Error(await r.text());
+      location.replace('/');
+    } catch (ex) {
+      err.hidden = false; err.textContent = 'Error: ' + ex.message;
+    } finally {
+      go.disabled = false; go.textContent = 'Sign In';
+    }
+  };
+  document.getElementById('li-user').focus();
+})();
+</script>
+</body>
+</html>

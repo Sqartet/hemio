@@ -1,0 +1,13 @@
+{
+  "name": "Hemio Dashboard",
+  "port": 8090,
+  "host": "0.0.0.0",
+  "files_root": "",
+  "health_interval_seconds": 15,
+  "geo": {
+    "city": "Casablanca",
+    "lat": 33.5731,
+    "lon": -7.5898
+  },
+  "ui": {}
+}

@@ -1,0 +1,9 @@
+hemio
+hemio.exe
+hemio.exe~
+*.log
+config.json
+apps.json
+auth.json
+devdata/
+*.tmp

@@ -1,0 +1,50 @@
+[
+  {
+    "title": "AdGuard Home",
+    "url": "http://192.168.1.103:3000",
+    "icon": "",
+    "category": "Network",
+    "health_check": "http://192.168.1.103:3000/control/status",
+    "description": "Network-wide ads & trackers blocking DNS server"
+  },
+  {
+    "title": "Jellyfin",
+    "url": "http://192.168.1.103:8096",
+    "icon": "",
+    "category": "Media",
+    "health_check": "http://192.168.1.103:8096/system/info",
+    "description": "Free software media system"
+  },
+  {
+    "title": "Home Assistant",
+    "url": "http://192.168.1.103:8123",
+    "icon": "",
+    "category": "Automation",
+    "health_check": "http://192.168.1.103:8123/api/",
+    "description": "Open source home automation"
+  },
+  {
+    "title": "Router",
+    "url": "http://192.168.1.1",
+    "icon": "",
+    "category": "Network",
+    "health_check": "",
+    "description": "Gateway admin panel"
+  },
+  {
+    "title": "Syncthing",
+    "url": "http://192.168.1.103:8384",
+    "icon": "",
+    "category": "Files",
+    "health_check": "http://192.168.1.103:8384/rest/system/status",
+    "description": "Continuous file synchronization"
+  },
+  {
+    "title": "Uptime Kuma",
+    "url": "http://192.168.1.103:3001",
+    "icon": "",
+    "category": "Monitoring",
+    "health_check": "http://192.168.1.103:3001/api/status-page",
+    "description": "A fancy self-hosted monitoring tool"
+  }
+]

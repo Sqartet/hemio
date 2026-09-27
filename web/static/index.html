@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hemio</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%2338a1ff'/><path d='M12 5.5 5.5 11v7.5h4v-5h5v5h4V11L12 5.5Z' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div id="wallpaper"></div>
+
+<!-- ===== macOS menu bar (floating pill) ===== -->
+<header id="menubar" class="glass">
+  <div class="mb-left">
+    <span class="mb-logo"><svg width="15" height="15" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#38a1ff"/><path d="M12 5.5 5.5 11v7.5h4v-5h5v5h4V11L12 5.5Z" fill="#fff"/></svg></span>
+    <span class="mb-welcome" id="mb-welcome">Welcome back, Hemio</span>
+  </div>
+  <div class="mb-right">
+    <button id="tb-battery" class="mb-item" hidden><span id="bat-icon"></span><span id="bat-pct">--%</span></button>
+    <button id="tb-wx" class="mb-item" title="Weather"><span id="wx-icon"></span><span id="wx-chip">--°</span></button>
+    <button id="tb-net" class="mb-item" title="Network"><span id="net-icon"></span></button>
+    <button id="tb-notif" class="mb-item bell" title="Notifications"><span id="notif-icon"></span><i id="notif-badge" hidden>0</i></button>
+    <button id="tb-power" class="mb-item" title="Lock / Sign out"><span id="power-icon"></span></button>
+    <button class="mb-item mb-clock" id="tb-clock"><span class="mb-date" id="mb-date">—</span><span class="mb-time" id="mb-time">--:--</span></button>
+  </div>
+</header>
+
+<!-- ===== Desktop ===== -->
+<div id="desk">
+  <!-- app icon row (Launchpad tiles on the desktop) -->
+  <div id="app-row"></div>
+
+  <!-- right widget rail -->
+  <aside id="widget-rail">
+    <section class="wcard">
+      <div class="whead"><span class="wico" data-ic="uptime"></span>UPTIME</div>
+      <div class="uptime-big" id="uptime-big">--</div>
+      <div class="wsub" id="w-os">—</div>
+    </section>
+
+    <section class="wcard">
+      <div class="whead"><span class="wico" data-ic="memory"></span>RESOURCES</div>
+      <div class="wrow"><span class="wl">CPU</span><span class="wv" id="m-cpu">--</span></div>
+      <div class="wbar"><i id="bar-cpu"></i></div>
+      <div class="wrow"><span class="wl">Memory</span><span class="wv" id="m-ram">--</span></div>
+      <div class="wbar"><i id="bar-ram"></i></div>
+      <div class="wrow"><span class="wl">Disk</span><span class="wv" id="m-disk">--</span></div>
+      <div class="wbar"><i id="bar-disk"></i></div>
+      <div class="wrow temp" id="temp-row" hidden><span class="wl">Temperature</span><span class="wv" id="m-temp">--</span></div>
+      <div class="wbar temp" id="temp-bar" hidden><i id="bar-temp"></i></div>
+    </section>
+
+    <section class="wcard">
+      <div class="whead"><span class="wico" data-ic="network"></span>NETWORK</div>
+      <div class="wrow"><span class="wl dn">↓ Download</span><span class="wv grn" id="m-nd">0.0 Mbps</span></div>
+      <div class="wrow"><span class="wl up">↑ Upload</span><span class="wv amb" id="m-nu">0.0 Mbps</span></div>
+      <hr class="wdiv">
+      <div class="wrow"><span class="wl">Interface</span><span class="wv" id="m-nif">—</span></div>
+      <div class="wrow"><span class="wl">IP</span><span class="wv" id="m-nip">—</span></div>
+      <div class="wrow"><span class="wl">Hostname</span><span class="wv" id="m-host">—</span></div>
+    </section>
+
+    <section class="mini-grid">
+      <div class="mini"><b id="hc-healthy">0</b><span>RUNNING</span><small>apps</small></div>
+      <div class="mini"><b id="hc-configured">0</b><span>INSTALLED</span><small>apps</small></div>
+      <div class="mini"><b id="hc-unhealthy">0</b><span>UNHEALTHY</span><small>apps</small></div>
+      <div class="mini"><b id="wx-big">--</b><span>WEATHER</span><small id="wx-city">—</small></div>
+    </section>
+  </aside>
+</div>
+
+<!-- ===== Dock ===== -->
+<div id="dock-wrap">
+  <div id="spotlight" class="glass" title="Search apps">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+    <span>⌘K</span>
+  </div>
+  <nav id="dock" class="glass">
+    <button class="dock-item" data-dock="launchpad" title="Launchpad"><span class="dico lp" data-ic="apps"></span></button>
+    <button class="dock-item" data-dock="notes" title="Notes"><span class="dico note" data-ic="note"></span></button>
+    <button class="dock-item" data-dock="files" title="Files">
+      <span class="dico folder"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M2.5 7.2A2.2 2.2 0 0 1 4.7 5h4.1a2.2 2.2 0 0 1 1.6.7l1 1.1h7.9a2.2 2.2 0 0 1 2.2 2.2v8.8A2.2 2.2 0 0 1 19.3 20H4.7a2.2 2.2 0 0 1-2.2-2.2V7.2Z" fill="#54aaff"/><path d="M2.5 9.4h19v1.1H2.5z" fill="#fff" opacity=".25"/></svg></span>
+    </button>
+    <button class="dock-item" data-dock="monitor" title="Activity"><span class="dico chart" data-ic="activity"></span></button>
+    <span class="dock-sep"></span>
+    <button class="dock-item" data-dock="settings" title="System Settings"><span class="dico gear" data-ic="gear"></span></button>
+    <button class="dock-item" data-dock="home" title="Hemio"><span class="dico home" data-ic="hexagon"></span></button>
+  </nav>
+</div>
+
+<!-- ===== Draggable window layer ===== -->
+<div id="win-layer"></div>
+
+<!-- ===== Menu-bar slide-down panel (battery / weather / net / search) ===== -->
+<div id="mb-panel" class="glass" hidden></div>
+
+<!-- ===== Calendar popup (click clock) ===== -->
+<div id="cal-pop" class="glass" hidden></div>
+
+<!-- ===== Launchpad overlay ===== -->
+<div id="launchpad" hidden><div id="lp-grid"></div></div>
+
+<script src="/js/icons.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/windows.js"></script>
+<script src="/js/files.js"></script>
+<script src="/js/widgets.js"></script>
+<script src="/js/grid.js"></script>
+<script src="/js/settings.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
