@@ -59,7 +59,7 @@ itself has no runtime dependencies — the frontend is embedded with `go:embed`.
 ### Build & run
 
 ```bash
-git clone https://github.com/Sqartet/hemio.git
+git clone git@github.com:Sqartet/hemio.git
 cd hemio
 go build -ldflags="-s -w" -o hemio .
 ./hemio
