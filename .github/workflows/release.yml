@@ -1,0 +1,107 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag (e.g. v1.2.0)'
+        required: true
+        default: 'v0.0.0-test'
+
+# concurrency: one release run at a time
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: linux,   goarch: amd64,   suffix: linux-amd64   }
+          - { goos: linux,   goarch: arm64,   suffix: linux-arm64   }   # Pi / Termux
+          - { goos: linux,   goarch: arm,     suffix: linux-armv7, arm: 7 }
+          - { goos: darwin,  goarch: amd64,   suffix: macos-amd64   }
+          - { goos: darwin,  goarch: arm64,   suffix: macos-arm64   }   # Apple Silicon
+          - { goos: windows, goarch: amd64,   suffix: windows-amd64, ext: .exe }
+          - { goos: windows, goarch: arm64,   suffix: windows-arm64, ext: .exe }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version-file: 'go.mod'
+          check-latest: true
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          GOARM: ${{ matrix.arm }}
+          CGO_ENABLED: 0
+        run: |
+          # go.mod declares go 1.27; toolchain auto-download covers it
+          go version
+          OUT="hemio-${{ matrix.suffix }}${{ matrix.ext }}"
+          go build -trimpath -ldflags="-s -w" -o "$OUT" .
+          ls -lh "$OUT"
+          echo "artifact=$OUT" >> "$GITHUB_ENV"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: ${{ matrix.suffix }}
+          path: ${{ env.artifact }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Download all binaries
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          pattern: '*'
+          path: dist/
+          merge-multiple: true
+
+      - name: Checksums
+        run: |
+          cd dist
+          sha256sum hemio-* > checksums.txt
+          cat checksums.txt
+
+      - name: Resolve tag name
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # v2.1.0
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: Hemio ${{ steps.tag.outputs.name }}
+          body: |
+            Single-binary macOS-style HomeLab dashboard. No runtime deps.
+            `linux-amd64` for VPS, `linux-arm64/armv7` for Raspberry Pi / Termux,
+            `macos-arm64` for Apple Silicon, `windows-amd64.exe`.
+
+            Verify with `sha256sum -c checksums.txt`.
+          files: dist/*
+          draft: false
+          prerelease: ${{ contains(steps.tag.outputs.name, '-') }}
