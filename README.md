@@ -68,13 +68,23 @@ go build -ldflags="-s -w" -o hemio .
 
 ### Prebuilt binaries
 
-Download the binary for your platform from the
-[Releases page](https://github.com/Sqartet/hemio/releases), then:
+Grab the latest from
+[Releases](https://github.com/Sqartet/hemio/releases/latest) — built
+automatically by CI for **Linux** (amd64 / arm64 / armv7), **macOS**
+(Intel / Apple Silicon) and **Windows** (amd64 / arm64):
 
 ```bash
+curl -sLO https://github.com/Sqartet/hemio/releases/latest/download/hemio-linux-amd64
+curl -sLO https://github.com/Sqartet/hemio/releases/latest/download/checksums.txt
 chmod +x hemio-linux-amd64
+sha256sum -c --ignore-missing checksums.txt   # verify then run
 ./hemio-linux-amd64
 ```
+
+Every release ships a `checksums.txt` — verify before you run.
+
+> **macOS note:** unsigned builds trigger Gatekeeper on first run. Either
+> `xattr -d com.apple.quarantine hemio-macos-*` or right-click → Open.
 
 ### Docker
 
@@ -228,6 +238,21 @@ The frontend is plain ES5-style scripts served as written — no bundler, no
 
 > The `docs/` images were captured at 1440×900 — re-run after UI changes so the
 > repo stays honest.
+
+---
+
+## 🏗️ Release process (maintainers)
+
+CI does the packaging — pushing a version tag triggers the full build matrix
+and publishes a GitHub Release with all 7 binaries + `checksums.txt`:
+
+```bash
+git tag v1.3.0
+git push origin v1.3.0
+```
+
+You can also run it manually from the **Actions → release → Run workflow**
+tab (`workflow_dispatch`).
 
 ---
 
